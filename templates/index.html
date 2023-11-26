@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simplex & Evolutionary Algorithm Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div id="container">
+        <aside id="sidebar">
+            <div id="user-profile"> <img src="{{ url_for('static', filename='images/no_profile_picture.jpg') }}" alt="User Profile Picture">
+                <p>User Name</p>
+            </div>
+            <div class="sidebar-bottom">
+                <hr class="sidebar-divider"> 
+                <button class="icon-button" title="Help"><i class="fas fa-question-circle"></i></button> 
+                <button class="icon-button" title="Settings"><i class="fas fa-cog"></i></button> 
+                <button class="icon-button" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </aside>
+        <main id="main-content">
+            <div>
+                <label for="variables">Количество переменных:</label>
+                <select id="variables">
+                </select>
+              </div>
+              
+              <div>
+                <label for="constraints">Количество ограничений:</label>
+                <select id="constraints">
+                </select>
+              </div>
+              
+              <div id="targetFunction">
+                <!-- Здесь будет форма для ввода целевой функции -->
+              </div>
+              <div id="constraintsDiv">
+                <!-- Здесь будут появляться поля ввода для ограничений -->
+              </div>
+              
+              <!-- <button id="submit">Отправить данные</button> -->
+              <section id="solution">
+                <div id="solution-tabs"> <button class="tab-button active" onclick="openTab(event, 'simplex-method')">Симплекс-метод</button> <button class="tab-button" onclick="openTab(event, 'evolutionary-algorithm')">Эволюционный алгоритм</button> </div>
+                <section id="solution-content">
+                    <div id="simplex-method" class="tab-content active">
+                        <!-- Content for Simplex Method will be displayed here -->
+                        <p>Здесь будет отображаться решение симплекс-методом.</p>
+                        <div class="table-buttons"> 
+                            <button id="simplex-solve">Решить</button>
+                        </div>
+                    </div>
+                    <div id="evolutionary-algorithm" class="tab-content">
+                        <!-- Content for Evolutionary Algorithm will be displayed here -->
+                        <p>Здесь будет отображаться решение эволюционным алгоритмом.</p>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
