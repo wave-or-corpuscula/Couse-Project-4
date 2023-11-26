@@ -62,7 +62,7 @@ function createVariableInputs() {
   // Сохраняем текущие значения переменных
   for (let i = 1; i <= numVariables; i++) {
     const input = document.querySelector(`#variable${i}`);
-    values.variables[`variable${i}`] = input ? input.value : '';
+    values.variables[`variable-${i}`] = input ? input.value : '';
   }
 
   const label = document.createElement("label");
@@ -76,8 +76,8 @@ function createVariableInputs() {
       label.textContent += ' + ' 
     }
     const input = document.createElement("input");
-    input.id = `variable${i}`;
-    input.value = values.variables[`variable${i}`] || '';
+    input.id = `variable-${i}`;
+    input.value = values.variables[`variable-${i}`] || '';
 
     targetFunctionDiv.appendChild(input);
     targetFunctionDiv.appendChild(label);
@@ -92,8 +92,8 @@ function createConstraintInputs() {
   
   // Сохраняем текущие значения переменных
   for (let i = 1; i <= numVariables; i++) {
-    const input = document.querySelector(`#variable${i}`);
-    values.variables[`variable${i}`] = input ? input.value : '';
+    const input = document.querySelector(`#variable-${i}`);
+    values.variables[`variable-${i}`] = input ? input.value : '';
   }
 
 
@@ -102,8 +102,8 @@ function createConstraintInputs() {
 
       // Сохраняем текущие значения ограничений
     for (let j = 1; j <= numVariables; j++) {
-      const input = document.querySelector(`#constraint${i}variable${j}`);
-      values.constraints[`constraint${i}variable${j}`] = input ? input.value : '';
+      const input = document.querySelector(`#constraint-${i}-variable-${j}`);
+      values.constraints[`constraint-${i}-variable-${j}`] = input ? input.value : '';
     }
 
     for (let j = 1; j <= numVariables; j++) {
@@ -111,8 +111,8 @@ function createConstraintInputs() {
       label.textContent = `x${j} + `;
       const input = document.createElement("input");
       input.type = "number";
-      input.classList.add(`constraint${i}variable${j}`);
-      input.value = values.constraints[`constraint${i}variable${j}`] || ''; // Восстанавливаем сохраненное значение, если есть
+      input.classList.add(`constraint-${i}-variable-${j}`);
+      input.value = values.constraints[`constraint-${i}-variable-${j}`] || ''; // Восстанавливаем сохраненное значение, если есть
       input.step = "any";
       constraintDiv.appendChild(label);
       constraintDiv.appendChild(input);
@@ -148,7 +148,7 @@ function collectFormData() {
 
   // Собираем данные целевой функции
   for (let i = 1; i <= formData.variables; i++) {
-    const inputValue = parseFloat(document.getElementById(`variable${i}`).value);
+    const inputValue = parseFloat(document.getElementById(`variable-${i}`).value);
     formData.targetFunction[`x${i}`] = inputValue;
   }
 
@@ -160,12 +160,12 @@ function collectFormData() {
     };
 
     for (let j = 1; j <= formData.variables; j++) {
-      const inputValue = parseFloat(document.querySelector(`.constraint${i}variable${j}`).value);
+      const inputValue = parseFloat(document.querySelector(`.constraint-${i}-variable-${j}`).value);
       constraintData.variables[`x${j}`] = inputValue;
     }
 
-    const comparisonValue = document.querySelector(`.constraint${i}comparison`).value;
-    const freeTermValue = parseFloat(document.querySelector(`.constraint${i}-free-term`).value);
+    const comparisonValue = document.querySelector(`.constraint-${i}-comparison`).value;
+    const freeTermValue = parseFloat(document.querySelector(`.constraint-${i}-free-term`).value);
 
     constraintData.comparison = comparisonValue;
     constraintData.freeTerm = freeTermValue;
@@ -177,9 +177,7 @@ function collectFormData() {
 }
 
 function sendDataToBackend() {
-  console.log("1");
   const data = collectFormData();
-  console.log("2");
 
   fetch('/read_table', {
     method: 'POST',

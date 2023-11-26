@@ -11,14 +11,16 @@ def index():
 
 @app.route("/read_table", methods=["POST"])
 def read_table():
-    print("Hello")
     data = request.get_json()
     table_data = data.get('tableData')
-    print(table_data)
 
-    # simplex_table = [[float(val) for val in row.values()] for row in table_data]
-    # for row in simplex_table:
-    #     print(row)
+    targer_func = table_data.get("targetFunction")
+    constraints = table_data.get("constraintsData")
+    print(targer_func)
+    for c in constraints:
+        print(c)
+        
+
 
     return f"Полученные данные: {table_data}"
 
