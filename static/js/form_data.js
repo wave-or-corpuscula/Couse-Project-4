@@ -4,13 +4,14 @@ function collectFormData() {
   const formData = {
     variables: parseInt(document.getElementById("variables").value),
     constraints: parseInt(document.getElementById("constraints").value),
+    positiveSolutions: document.getElementById("positive-solutions").checked,
     targetFunction: {},
     optimizationDirection: document.getElementById("optimization-direction").value
   };
 
   // Собираем данные целевой функции
   for (let i = 1; i <= formData.variables; i++) {
-    const inputValue = parseFloat(document.getElementById(`variable-${i}`).value);
+    const inputValue = document.getElementById(`variable-${i}`).value;
     formData.targetFunction[`x${i}`] = inputValue;
   }
 
@@ -22,12 +23,12 @@ function collectFormData() {
     };
 
     for (let j = 1; j <= formData.variables; j++) {
-      const inputValue = parseFloat(document.querySelector(`.constraint-${i}-variable-${j}`).value);
+      const inputValue = document.querySelector(`.constraint-${i}-variable-${j}`).value;
       constraintData.variables[`x${j}`] = inputValue;
     }
 
     const comparisonValue = document.querySelector(`.constraint-${i}-comparison`).value;
-    const freeTermValue = parseFloat(document.querySelector(`.constraint-${i}-free-term`).value);
+    const freeTermValue = document.querySelector(`.constraint-${i}-free-term`).value;
 
     constraintData.comparison = comparisonValue;
     constraintData.freeTerm = freeTermValue;
@@ -39,6 +40,9 @@ function collectFormData() {
 }
 
 function sendDataToBackend() {
+  const simplexAnswerDiv = document.getElementById("simplex-solution")
+  const errorMessageDiv = document.getElementById("error-message")
+
   const data = collectFormData();
 
   fetch('/simplex_solve', {
@@ -50,11 +54,19 @@ function sendDataToBackend() {
   })
   .then(response => {
     if (response.ok) {
-      // Обработка успешного ответа от сервера
-      console.log('Данные успешно отправлены на сервер');
+      return response.json()
     } else {
-      // Обработка ошибки
-      console.error('Ошибка отправки данных на сервер');
+      throw new Error("Something went")
+    }
+  })
+  .then((data) => {
+    const html = data.html
+    if (data.ok) {
+      simplexAnswerDiv.innerHTML = html;
+      errorMessageDiv.innerHTML = "";
+    } else {
+      errorMessageDiv.innerHTML = html;
+      simplexAnswerDiv.innerHTML = "";
     }
   })
   .catch(error => {
@@ -62,23 +74,24 @@ function sendDataToBackend() {
   });
 }
 
-document.getElementById("simplex-solve").addEventListener("click", function() {
-  fetch('/simplex_solve', {
-    method: 'POST',
-    body: JSON.stringify({}),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => response.text())
-  .then(data => {
-    // Обновление содержимого страницы в соответствии с ответом от сервера
-    document.getElementById("solution-content").innerHTML += data["simplex_solution"];
-  })
-  .catch(error => {
-    console.error('Произошла ошибка:', error);
-  });
-});
+// document.getElementById("simplex-solve").addEventListener("click", function() {
+// 
+//   fetch('/simplex_solve', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({ tableData: tableData })
+//   })
+//   .then(response => response.text())
+//   .then(data => {
+//     // Обновление содержимого страницы в соответствии с ответом от сервера
+//     document.getElementById("solution-content").innerHTML += data["simplex_solution"];
+//   })
+//   .catch(error => {
+//     console.error('Произошла ошибка:', error);
+//   });
+// });
 
 
 document.addEventListener("DOMContentLoaded", function() {

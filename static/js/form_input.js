@@ -1,7 +1,15 @@
-const maxConstraintsAmount = 10;
+const maxConstraintsAmount = 20;
 const minConstraintsAmount = 2;
 const maxVariablesAmount = 10;
 const minVariablesAmount = 2;
+
+const startFunctionCoefs = [1, 3];
+const startConstrCoefs = [
+  [0.1, 0.4],
+  [0.01, 0.04]
+]
+const startFreeTerms = [160, 24]
+
 
 const values = {
   variables: {},
@@ -20,6 +28,10 @@ function fillConstraintsSelect() {
   }
 }
 
+function setConstraintsSelect(value) {
+  document.getElementById("constraints").value = value;
+}
+
 function fillVariablesSelect() {
   const constraintsSelect = document.getElementById("variables");
   constraintsSelect.innerHTML = "";
@@ -32,6 +44,9 @@ function fillVariablesSelect() {
   }
 }
 
+function setVariablesSelect(value) {
+  document.getElementById("variables").value = value;
+}
 
 function createVariableInputs() {
   const numVariables = parseInt(document.getElementById("variables").value);
@@ -92,7 +107,6 @@ function createConstraintInputs() {
     values.variables[`variable-${i}`] = input ? input.value : '';
   }
 
-
   for (let i = 1; i <= numConstraints; i++) {
     const constraintDiv = document.createElement("div");
 
@@ -103,20 +117,26 @@ function createConstraintInputs() {
     }
 
     for (let j = 1; j <= numVariables; j++) {
-      const label = document.createElement("label");
-      label.textContent = `x${j} + `;
       const input = document.createElement("input");
-      input.type = "number";
+      // input.type = "number";
       input.classList.add(`constraint-${i}-variable-${j}`);
       input.value = values.constraints[`constraint-${i}-variable-${j}`] || ''; // Восстанавливаем сохраненное значение, если есть
       input.step = "any";
-      constraintDiv.appendChild(label);
+
+      const label = document.createElement("label");
+      if (j != numVariables) {
+        label.textContent = `x${j} + `;
+      } else {
+        label.textContent = `x${j}`;
+      }
+
       constraintDiv.appendChild(input);
+      constraintDiv.appendChild(label);
     }
 
     const select = document.createElement("select");
     select.classList.add(`constraint-${i}-comparison`);
-    const options = [">=", "<=", "="];
+    const options = [">=", "<="];
     for (const option of options) {
       const optionElement = document.createElement("option");
       optionElement.value = option;
@@ -126,7 +146,7 @@ function createConstraintInputs() {
     constraintDiv.appendChild(select);
 
     const freeTermInput = document.createElement("input");
-    freeTermInput.type = "number";
+    // freeTermInput.type = "number";
     freeTermInput.classList.add(`constraint-${i}-free-term`);
     freeTermInput.step = "any";
     constraintDiv.appendChild(freeTermInput);
@@ -135,11 +155,36 @@ function createConstraintInputs() {
   }
 }
 
+function setStartVariables(varsList) {
+  document.getElementById("variables").value = startFunctionCoefs.length;
+
+  for (let i = 0; i < varsList.length; i++) {
+    document.getElementById(`variable-${i + 1}`).value = varsList[i];
+  }
+}
+
+function setStartConstraints(constrList, comparsions, freeTerms) {
+  document.getElementById("constraints").value = startFunctionCoefs.length;
+
+  for (let i = 0; i < constrList.length; i++) {
+    for (let j = 0; j < constrList[i].length; j++) {
+      document.querySelector(`.constraint-${i + 1}-variable-${j + 1}`).value = constrList[i][j];
+    }
+    document.querySelector(`.constraint-${i + 1}-comparison`).value = comparsions[i];
+    document.querySelector(`.constraint-${i + 1}-free-term`).value = freeTerms[i];
+  }
+
+}
+
 function startup() {
     fillConstraintsSelect();
     fillVariablesSelect();
+
     createVariableInputs()
     createConstraintInputs()
+    
+    setStartVariables(startFunctionCoefs);
+    setStartConstraints(startConstrCoefs, ["<=", "<="], startFreeTerms);
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -147,7 +192,6 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("variables").addEventListener("change", createVariableInputs);
     document.getElementById("variables").addEventListener("change", createConstraintInputs);
     document.getElementById("constraints").addEventListener("change", createConstraintInputs);
-    // document.getElementById("simplex-solve").addEventListener("click", sendDataToBackend);
+    
     startup();
-
 });
