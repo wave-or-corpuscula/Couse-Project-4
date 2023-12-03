@@ -48,31 +48,19 @@ class SimplexMethod:
         self.simplex_table = [materials[i] + [0 if var != i else 1 for var in range(add_vars)] for i in range(len(materials))]
         self.basis = [i + add_vars for i in range(len(materials))]
         self.profits = [prof for prof in profit] + [0 for _ in range(len(materials))]
-
-        for row in self.simplex_table:
-            print(row)
-
         self.reserve = reserve
-        
-        print(f"basis: {self.basis}")
-        print(f"profits: {self.profits}")
-        print(f"reserves: {self.reserve}")
-
         self.deltas = self.recount_deltas()
-        print(f"Delatas: {self.deltas}")
-
         self.solve()
 
+    # Пересчет дельт
     def recount_deltas(self):
         new_deltas = []
         i = 0
         for j in range(len(self.simplex_table[i])):
             sum = 0
             for i in range(len(self.simplex_table)):
-                # print(f"{self.simplex_table[i][j]} * {self.profits[self.basis[i]]} + ")
                 sum += self.simplex_table[i][j] * self.profits[self.basis[i]]
             sum -= self.profits[j]
-            # print(f"Delta[{j}] = {sum}")
             new_deltas.append(sum)
         return new_deltas
 
@@ -91,14 +79,12 @@ class SimplexMethod:
             if frac < min_value:
                 min_index = i
                 min_value = frac
-            print(f"Fraction: {frac}, min ind: {min_index}")
         return min_index
     
     # Пересчитывает всю симплекс-таблицу
     def recount_table(self, row_index: int, col_index: int):
         # Изменяем базисные переменные
         self.basis[row_index] = col_index
-        print(f"New basis: {self.basis}")
 
         # Разрешающий элемент
         permissive_element = self.simplex_table[row_index][col_index]
@@ -111,7 +97,6 @@ class SimplexMethod:
             else:
                 new_reserves.append(reserve - self.reserve[row_index] / permissive_element * self.simplex_table[i][col_index])
         self.reserve = new_reserves
-        print(f"New reserves: {self.reserve}")
 
         # Пересчитываем коэффициенты симплекс-таблицы
         new_simplex_table = [[None for _ in row] for row in self.simplex_table]
@@ -123,12 +108,7 @@ class SimplexMethod:
                     new_simplex_table[i][j] = self.simplex_table[i][j] - self.simplex_table[row_index][j] / permissive_element * self.simplex_table[i][col_index]
 
         self.simplex_table = new_simplex_table
-        print("New Simplex table")
-        for row in self.simplex_table:
-            print(row)
-
         self.deltas = self.recount_deltas()
-        print(f"New deltas: {self.deltas}")
 
     def target_function(self):
         return sum([self.profits[bas_ind] * self.reserve[i] for i, bas_ind in enumerate(self.basis)])
