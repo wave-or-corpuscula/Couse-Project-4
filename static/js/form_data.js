@@ -96,6 +96,6 @@ function sendDataToBackend() {
 
 document.addEventListener("DOMContentLoaded", function() {
 
-  document.getElementById("simplex-solve").addEventListener("click", sendDataToBackend);
+  // document.getElementById("simplex-solve").addEventListener("click", sendDataToBackend);
 
 });

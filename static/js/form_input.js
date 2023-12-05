@@ -189,9 +189,9 @@ function startup() {
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    document.getElementById("variables").addEventListener("change", createVariableInputs);
-    document.getElementById("variables").addEventListener("change", createConstraintInputs);
-    document.getElementById("constraints").addEventListener("change", createConstraintInputs);
+    // document.getElementById("variables").addEventListener("change", createVariableInputs);
+    // document.getElementById("variables").addEventListener("change", createConstraintInputs);
+    // document.getElementById("constraints").addEventListener("change", createConstraintInputs);
     
-    startup();
+    // startup();
 });

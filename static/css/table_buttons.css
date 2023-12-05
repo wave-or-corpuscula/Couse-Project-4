@@ -1,0 +1,44 @@
+.table-container {
+    display:flex;
+    justify-content:space-between;
+    width: 80%;
+}
+
+.table-buttons-container {
+    border: 5px solid red;
+    /* justify-content: right;
+    align-content: right; */
+    /* align-self: right; */
+    right: 0px;
+}
+
+.table-buttons {
+display: flex;
+flex-direction: column;
+padding: 0 10px;
+}
+
+.table-buttons button {
+background-color:#5f3180;
+border:none;
+color:white;
+padding:15px 32px;
+text-align:center;
+text-decoration:none;
+display:inline-block;
+font-size:16px;
+margin:4px 2px;
+cursor:pointer;
+border-radius:50px;
+box-shadow:0 4px #999
+}
+
+.table-buttons button:hover {
+background-color:#43235b;
+}
+
+.table-buttons button:active {
+background-color:#2b153a;
+box-shadow:0 2px #666;
+transform:translateY(1px)
+}

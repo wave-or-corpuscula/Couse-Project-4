@@ -1,5 +1,5 @@
 <div id="input_form">
-    <div>
+    <!-- <div>
         <label for="variables">Количество переменных:</label>
         <select id="variables" name="variables">
         </select>
@@ -12,13 +12,54 @@
       </div>
       
       <div id="targetFunction" name="targetFunction">
-        <!-- Здесь будуе поля для ввода целевой функции -->
       </div>
+
       <div id="constraintsDiv" name="constraintsDiv">
-        <!-- Здесь будут поля ввода для ограничений -->
       </div>
+      
       <div>
         <input type="checkbox" id="positive-solutions"> Добавить ограничение неотрицательности
+      </div> -->
+      <div class="table-container">
+        <table id="simplex-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Продукт 1</th>
+              <th>Продукт 2</th>
+              <th>Запасы</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Материал 1</th>
+              <td><input name="cell-1-1" ></td>
+              <td><input name="cell-1-2" ></td>
+              <td><input name="reserve-1" ></td>
+            </tr>
+            <tr>
+              <th>Материал 2</th>
+              <td><input name="cell-2-1" value="12"></td>
+              <td><input name="cell-2-2"></td>
+              <td><input name="reserve-2" ></td>
+            </tr>
+            <tr>
+              <th>Цена</th>
+              <td><input name="profit-1"></td>
+              <td><input name="profit-2"></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-buttons-container">
+          <div class="table-buttons"> 
+            <button id="add-column">Добавить продукт</button> 
+            <button id="delete-column">Удалить продукт</button>
+            <button id="add-row">Добавить материал</button> 
+            <button id="delete-row">Удалить материал</button> 
+        </div>
+        </div>
+
       </div>
       <div id="error-message" style="color: red;">
 
