@@ -76,20 +76,40 @@ def simplex_test():
         print()
     return render_template('simplex_solution.html', solution=method.solution)
 
+@app.route("/evolution_solve", methods=["POST"])
+def evolution_solve():
+    if request.method == "POST":
+        response = { 'ok': True, 'html': None }
+        
+        data = request.get_json()
+        form_data = data.get('formData')
+
+        try:
+            form_data = format_form_data_evolution(form_data)
+            print(form_data)
+        except:
+            response["ok"] = False
+            response['html'] = render_template('error_message.html', 
+                                               messages=["Ошибка!", "Проверьте коррестность введенных данных!"])
+            return jsonify(response)
+        return jsonify(response)
+        
 
 
 @app.route("/simplex_solve", methods=["POST"])
 def read_table():
     if request.method == "POST":
         response = { 'ok': True, 'html': None }
-
+        
         data = request.get_json()
         form_data = data.get('formData')
 
         try:
-            form_data = format_form_data(form_data)
+            form_data = format_form_data_simplex(form_data)
         except:
-            print("Error!")
+            response["ok"] = False
+            response['html'] = render_template('error_message.html', 
+                                               messages=["Ошибка!", "Проверьте коррестность введенных данных!"])
             return jsonify(response)
 
         method = SimplexMethod(materials=form_data["tableData"],
@@ -101,11 +121,24 @@ def read_table():
         return jsonify(response)
     
 
-def format_form_data(form_data: list):
+def format_form_data_simplex(form_data: dict):
     form_data["tableData"] = [[float(el) for el in row] for row in form_data["tableData"]]
     form_data["reserves"] = [float(res) for res in form_data["reserves"]]
     form_data["profits"] = [float(prof) for prof in form_data["profits"]]
     return form_data
+
+
+def format_form_data_evolution(form_data: dict):
+    form_data["populationSize"] = int(form_data["populationSize"])
+    form_data["numGenerations"] = int(form_data["numGenerations"])
+    form_data["mutationRate"] = int(form_data["mutationRate"])
+    form_data["tournamentSize"] = int(form_data["tournamentSize"])
+    form_data["minArgVal"] = int(form_data["minArgVal"])
+    form_data["maxArgVal"] = int(form_data["maxArgVal"])
+    form_data.update(format_form_data_simplex(form_data))
+    return form_data
+
+
 
 
 if __name__ == "__main__":

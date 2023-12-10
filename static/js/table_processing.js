@@ -30,11 +30,6 @@ function deleteRow() {
 
     // Check if we have more than the header row and column
     if (lastRowIndex > 2) {
-        // Delete the last column from all rows
-        // for (let i = 0; i <= lastRowIndex; i++) {
-        // table.rows[i].deleteCell(lastColIndex);
-        // }
-        // Delete the last row
         table.deleteRow(lastRowIndex);
     }
 }
@@ -42,12 +37,10 @@ function deleteRow() {
 function getReserves() {
     const table = document.getElementById("simplex-table");
     const reservesCount = table.rows.length - 2;
-    // console.log(table.innerHTML);
 
     reserves = [];
     for (let i = 0; i < reservesCount; i++) {
         reserves.push(document.getElementsByName(`reserve-${i + 1}`)[0].value);
-        // console.log(`${i + 1} res value: ${input.value}`);
     }
     return reserves;
 }
@@ -184,7 +177,7 @@ function addReserves(reserves) {
     }
 }
 
-function sendDataToBackend() {
+function simplexSolve() {
 
     const simplexAnswerDiv = document.getElementById("simplex-solution");
     const errorMessageDiv = document.getElementById("error-message");
@@ -226,6 +219,51 @@ function sendDataToBackend() {
     });
 }
 
+function evolutionSolve() {
+    const evolutionAnswerDiv = document.getElementById("evolution-solution");
+    const errorMessageDiv = document.getElementById("error-message");
+
+    const formData = {
+        profits: getProfits(),
+        reserves: getReserves(),
+        tableData: getTableData(),
+        populationSize: document.getElementById("populationSize").value,
+        numGenerations: document.getElementById("numGenerations").value,
+        mutationRate: document.getElementById("mutationRate").value,
+        tournamentSize: document.getElementById("tournamentSize").value,
+        minArgVal: document.getElementById("minArgVal").value,
+        maxArgVal: document.getElementById("maxArgVal").value
+    }
+
+    fetch('/evolution_solve', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ formData: formData }),
+        })
+        .then(response => {
+        if (response.ok) {
+            return response.json()
+        } else {
+            throw new Error("Something went")
+        }
+        })
+        .then((data) => {
+        const html = data.html
+        if (data.ok) {
+            evolutionAnswerDiv.innerHTML = html;
+            errorMessageDiv.innerHTML = "";
+        } else {
+            errorMessageDiv.innerHTML = html;
+            evolutionAnswerDiv.innerHTML = "";
+        }
+        })
+        .catch(error => {
+        console.error('Произошла ошибка:', error);
+    });
+}
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -245,7 +283,8 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("add-column").addEventListener("click", addColumn);
     document.getElementById("delete-column").addEventListener("click", deleteColumn);
 
-    document.getElementById("simplex-solve").addEventListener("click", sendDataToBackend);
+    document.getElementById("simplex-solve").addEventListener("click", simplexSolve);
+    document.getElementById("evolution-solve").addEventListener("click", evolutionSolve);
 
     setInitialParameters(initialTable, initialReserves, initialProfits);
 });

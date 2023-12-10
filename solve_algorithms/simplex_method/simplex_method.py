@@ -49,8 +49,7 @@ profits = [
 
 class SimplexMethod:
 
-    def __init__(self, materials: list, reserve: list, profit: list, objective = 'max'):
-        add_vars = len(materials)
+    def __init__(self, materials: list, reserve: list, profit: list):
         self.vars_amount = len(materials[0])
 
         self.solution = {
@@ -58,35 +57,13 @@ class SimplexMethod:
             "parameters": {}
         }
 
-        self.permissive_column_meth = {
-            'max': lambda deltas : deltas.index(min(deltas)),
-            'min': lambda deltas : deltas.index(max(deltas))
-        }[objective]
-
-        self.is_not_optimal = {
-            'max': lambda deltas : any(delta < 0 for delta in deltas),
-            'min': lambda deltas : any(delta > 0 for delta in deltas)
-        }[objective]
-
         # Формируем симплекс-таблицу
         self.simplex_table = [materials[i] + [0 if var != i else 1 for var in range(len(materials))] for i in range(len(materials))]
-        self.basis = [i + add_vars for i in range(len(materials))]
-        if objective == 'max':
-            self.profits = [prof for prof in profit] + [0 for _ in range(len(materials))]
-        elif objective == 'min':
-            self.profits = [-prof for prof in profit] + [0 for _ in range(len(materials))]
-
-        for row in self.simplex_table:
-            print(row)
-
+        self.basis = [i + self.vars_amount for i in range(len(materials))]
+        self.profits = [prof for prof in profit] + [0 for _ in range(len(materials))]
         self.reserve = reserve
-        
-        print(f"basis: {self.basis}")
-        print(f"profits: {self.profits}")
-        print(f"reserves: {self.reserve}")
 
         self.deltas = self.recount_deltas()
-        print(f"Delatas: {self.deltas}")
         self.save_iteration()
         self.solve()
 
@@ -96,16 +73,14 @@ class SimplexMethod:
         for j in range(len(self.simplex_table[i])):
             sum = 0
             for i in range(len(self.simplex_table)):
-                # print(f"{self.simplex_table[i][j]} * {self.profits[self.basis[i]]} + ")
                 sum += self.simplex_table[i][j] * self.profits[self.basis[i]]
             sum -= self.profits[j]
-            # print(f"Delta[{j}] = {sum}")
             new_deltas.append(sum)
         return new_deltas
 
     # Возвращает индекс минимального (отрицательного) значения стоимости товара
     def permissive_column(self):
-        return self.permissive_column_meth(self.deltas)
+        return self.deltas.index(min(self.deltas))
 
     # Возвращает индекс минимального отношения запасов к количеству на единицу товара
     def permissive_row(self, min_profit_ind: int):
@@ -118,14 +93,12 @@ class SimplexMethod:
             if frac < min_value:
                 min_index = i
                 min_value = frac
-            print(f"Fraction: {frac}, min ind: {min_index}")
         return min_index
     
     # Пересчитывает всю симплекс-таблицу
     def recount_table(self, row_index: int, col_index: int):
         # Изменяем базисные переменные
         self.basis[row_index] = col_index
-        print(f"New basis: {self.basis}")
 
         # Разрешающий элемент
         permissive_element = self.simplex_table[row_index][col_index]
@@ -138,7 +111,6 @@ class SimplexMethod:
             else:
                 new_reserves.append(reserve - self.reserve[row_index] / permissive_element * self.simplex_table[i][col_index])
         self.reserve = new_reserves
-        print(f"New reserves: {self.reserve}")
 
         # Пересчитываем коэффициенты симплекс-таблицы
         new_simplex_table = [[None for _ in row] for row in self.simplex_table]
@@ -150,12 +122,7 @@ class SimplexMethod:
                     new_simplex_table[i][j] = self.simplex_table[i][j] - self.simplex_table[row_index][j] / permissive_element * self.simplex_table[i][col_index]
 
         self.simplex_table = new_simplex_table
-        print("New Simplex table")
-        for row in self.simplex_table:
-            print(row)
-
         self.deltas = self.recount_deltas()
-        print(f"New deltas: {self.deltas}")
 
     # Значение целевой функции
     def target_function(self):
@@ -163,15 +130,9 @@ class SimplexMethod:
     
     # Итерация
     def iteration(self):
-        print()
-        print("==== Iteration ====")
-
         min_delta_column = self.permissive_column()
-        print(f"Deltas: {self.deltas}, min index: {min_delta_column}")
         min_q_row = self.permissive_row(min_delta_column)
-        print(f"Min Q index: {min_q_row}")
         self.recount_table(min_q_row, min_delta_column)
-        print(f"Target function: {self.target_function()}")
 
     # Сохранение данных текущей итерации
     def save_iteration(self):
@@ -197,19 +158,17 @@ class SimplexMethod:
         self.solution["function"] = self.target_function()
 
     def solve(self):
-        while (self.is_not_optimal(self.deltas)):
+        while (any(delta < 0 for delta in self.deltas)):
             self.iteration()
             self.save_iteration()
         self.save_results()
-        print(f"Target function: {self.target_function()}")
 
 
 if __name__ == "__main__":
     task_index = 4
     method = SimplexMethod(material_tables[task_index], 
                            reserves[task_index], 
-                           profits[task_index], 
-                           'min')
-    # for iter in method.iterations:
-    #     print(iter)
+                           profits[task_index]
+                           )
+    print(method.solution["parameters"])
     
